@@ -1,0 +1,130 @@
+/**
+  * Construtor de Hanoi.
+  * O construtor cria os 3 pinos e inicializa o contador de jogadas
+  *
+  * @param O numero de discos do jogo
+  */ 
+public Hanoi() {
+   torre = new LinkedList[3];
+   for(int i = 0; i < torre.length; i++)
+      torre[i] = new LinkedList();
+   jogadas = 0;
+}
+
+/**
+  * Inicializa o jogo, colocando os discos no primeiro pino.
+  * 
+  * @param O numero de discos do jogo
+  */
+private void novoJogo(int nDiscos) {
+   for(int i = nDiscos; i > 0; i--) {
+      String disco = String.valueOf(i);
+      torre[0].addFirst(disco);
+   }
+   jogadas = 0;
+}
+
+/**
+  * Move o disco de um pino para outro.
+  * 
+  * @param O pino de onde deve sair o disco (1 a 3).
+  * @param O pino onde o disco sera colocado (1 a 3).
+  * @throws Mensagem "erro: jogada invalida" caso o pino de destino tenha um disco menor que o disco movido.
+  */ 
+public void move(int deSaida, int deDestino) throws Exception {
+   deSaida--;
+   deDestino--;
+   
+   int discoASerMovido = Integer.parseInt((String)torre[deSaida].getFirst());
+   if((torre[deDestino].size() == 0) || 
+      (discoASerMovido < Integer.parseInt((String)torre[deDestino].getFirst()))) {
+      String disco = String.valueOf(torre[deSaida].getFirst());
+      torre[deDestino].addFirst(disco);
+      torre[deSaida].removeFirst();
+      
+      jogadas++;   	   
+   } else throw new Exception("erro: jogada invalida");
+}
+
+// FALTA FAZER
+public void solucao() {}
+
+/**
+  * Apaga todos os discos dos pinos para comecar um novo jogo.
+  */ 
+public void clear() {
+   for(int i = 0; i < torre.length; i++)
+      torre[i].clear();
+}
+
+/**
+  * Imprime a saida do jogo, deve ser chamado a cada movimento dos discos.
+  * Caso o jogador venca, tambem e impresso o numero de jogadas e de jogadas erradas.
+  */
+public String toString() {
+   String jogo = "";
+   for(int i = 0; i < torre.length; i++) {
+      Iterator buscador = torre[i].iterator();
+      while(buscador.hasNext())
+         jogo += String.valueOf(buscador.next());
+      
+      if(i != torre.length - 1)
+         if(!buscador.hasNext()) jogo += "|";
+      
+   }
+   if((torre[0].size() == 0) && (torre[1].size() == 0)) {
+      jogo += " : " + jogadas + " : ";
+   }
+   return jogo;   
+}
+
+/**
+  * Analiza o comando de entrada do usuario para executar o metodo adequado.
+  *
+  * @param O comando de entrada do usuario.
+  * @param O objeto hanoi onde sera executado o jogo.
+  * @return Uma linha de saida com o resultado do comando, de acordo com a situacao do jogo.
+  */   
+private String analizarComando(String out, Hanoi hanoi) {
+   StringTokenizer entrada = new StringTokenizer(out);
+   String comando = entrada.nextToken();
+   
+   if(comando.equals("novojogo")) {
+      int nDiscos = Integer.parseInt((String)entrada.nextToken());
+      hanoi.clear();
+      hanoi.novoJogo(nDiscos);
+   } 
+   else if(comando.equals("move")) {
+      int torreSaida = Integer.parseInt((String)entrada.nextToken());
+      int torreDestino = Integer.parseInt((String)entrada.nextToken());
+      try {
+         hanoi.move(torreSaida, torreDestino);
+      } catch(Exception e) {
+         return e.getMessage();
+      }
+   }
+   else if(comando.equals("solucao")) {
+      hanoi.solucao();
+      return "FALTA FAZER";
+   } 
+   
+   return hanoi.toString();	   
+}
+
+
+// Main.
+public static void main(String[] args) {
+   BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+   Hanoi hanoi = new Hanoi();
+   
+   String out = "";
+   try {
+      while((out = in.readLine()) != null) {
+         System.out.println(hanoi.analizarComando(out, hanoi));
+      }
+   } catch(Exception e) {
+      e.getMessage();
+      System.exit(1);
+   }	   
+
+}
